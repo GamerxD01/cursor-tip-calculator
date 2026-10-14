@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TipWise — Smart Tip & Bill Splitter</title>
+  <meta name="description" content="A modern, reactive tip calculator and bill splitting web app built with AI pair programming in Cursor.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-theme="dark">
+  <div class="app-background">
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+    <div class="glow-orb orb-3"></div>
+  </div>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="1" x2="12" y2="23"></line>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
+        </div>
+        <div>
+          <h1 class="brand-title">TipWise</h1>
+          <span class="brand-subtitle">Smart Tip & Split Calculator</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- Currency Selector -->
+        <div class="currency-selector-wrapper">
+          <label for="currency-select" class="sr-only">Currency</label>
+          <select id="currency-select" class="currency-select" title="Change currency">
+            <option value="$" selected>USD ($)</option>
+            <option value="€">EUR (€)</option>
+            <option value="£">GBP (£)</option>
+            <option value="₹">INR (₹)</option>
+            <option value="¥">JPY (¥)</option>
+            <option value="C$">CAD (C$)</option>
+            <option value="A$">AUD (A$)</option>
+          </select>
+        </div>
+
+        <!-- Dark Mode Toggle -->
+        <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle dark/light theme" title="Toggle theme">
+          <span class="icon-sun">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+          </span>
+          <span class="icon-moon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Card Grid -->
+    <main class="calculator-grid">
+      <!-- Input Panel -->
+      <section class="calc-panel input-panel">
+        <h2 class="panel-heading">Bill Details</h2>
+
+        <!-- Bill Amount Input -->
+        <div class="form-group">
+          <label for="bill-amount" class="input-label">
+            <span>Bill Amount</span>
+            <span class="label-hint">Before tip</span>
+          </label>
+          <div class="input-wrapper">
+            <span class="input-prefix" id="curr-prefix">$</span>
+            <input 
+              type="number" 
+              id="bill-amount" 
+              class="form-input text-lg" 
+              placeholder="0.00" 
+              step="0.01" 
+              min="0"
+              autofocus
+            >
+          </div>
+        </div>
+
+        <!-- Tip Selector -->
+        <div class="form-group">
+          <div class="label-with-badge">
+            <label class="input-label">Select Tip Percentage</label>
+            <span class="badge" id="tip-badge">15%</span>
+          </div>
+          
+          <div class="tip-options" id="tip-chips-container">
+            <button type="button" class="tip-chip" data-tip="5">5%</button>
+            <button type="button" class="tip-chip" data-tip="10">10%</button>
+            <button type="button" class="tip-chip active" data-tip="15">15%</button>
+            <button type="button" class="tip-chip" data-tip="18">18%</button>
+            <button type="button" class="tip-chip" data-tip="20">20%</button>
+            <button type="button" class="tip-chip" data-tip="25">25%</button>
+            <button type="button" class="tip-chip custom-trigger" id="custom-tip-chip">Custom</button>
+          </div>
+
+          <!-- Custom Tip Slider & Input -->
+          <div class="custom-tip-container hidden" id="custom-tip-container">
+            <div class="custom-slider-row">
+              <input type="range" id="tip-slider" min="0" max="100" value="15" class="custom-slider">
+              <div class="custom-input-wrap">
+                <input type="number" id="custom-tip-input" min="0" max="500" value="15" class="custom-input">
+                <span class="percent-sign">%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Split Count -->
+        <div class="form-group">
+          <label for="split-count" class="input-label">
+            <span>Split Between People</span>
+            <span class="label-hint">Equal split</span>
+          </label>
+          <div class="stepper-wrapper">
+            <button type="button" class="stepper-btn" id="split-decrease" aria-label="Decrease people count">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+            </button>
+            <div class="stepper-display">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+              <input type="number" id="split-count" min="1" max="100" value="1" class="stepper-input">
+              <span class="stepper-unit" id="stepper-unit-label">person</span>
+            </div>
+            <button type="button" class="stepper-btn" id="split-increase" aria-label="Increase people count">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Rounding / Quick Controls -->
+        <div class="controls-row">
+          <label class="toggle-control">
+            <input type="checkbox" id="round-toggle">
+            <span class="toggle-slider"></span>
+            <span class="toggle-label">Round up total to nearest whole unit</span>
+          </label>
+          <button type="button" id="reset-btn" class="reset-link-btn" title="Reset all inputs">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M23 4v6h-6"></path>
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+            </svg>
+            Reset
+          </button>
+        </div>
+      </section>
+
+      <!-- Output / Results Panel -->
+      <section class="calc-panel output-panel">
+        <div class="output-inner">
+          <div class="output-header">
+            <h2 class="panel-heading text-white">Summary Breakdown</h2>
+            <span class="live-pill"><span class="dot"></span> Live</span>
+          </div>
+
+          <!-- Highlight Cards -->
+          <div class="highlight-cards">
+            <!-- Per Person Highlight -->
+            <div class="highlight-card hero-card">
+              <div class="card-meta">
+                <span class="card-label">Total Per Person</span>
+                <span class="card-sublabel">Everything included</span>
+              </div>
+              <div class="hero-amount" id="display-per-person">$0.00</div>
+            </div>
+
+            <!-- Tip Per Person -->
+            <div class="highlight-card secondary-card">
+              <div class="card-meta">
+                <span class="card-label">Tip Per Person</span>
+                <span class="card-sublabel">Share of gratuity</span>
+              </div>
+              <div class="card-amount" id="display-tip-per-person">$0.00</div>
+            </div>
+          </div>
+
+          <!-- Detailed Breakdown Rows -->
+          <div class="breakdown-list">
+            <div class="breakdown-row">
+              <span class="row-label">Base Bill Amount</span>
+              <span class="row-value" id="display-base-bill">$0.00</span>
+            </div>
+            <div class="breakdown-row">
+              <span class="row-label">Total Tip (<span id="display-tip-rate">15%</span>)</span>
+              <span class="row-value tip-color" id="display-total-tip">$0.00</span>
+            </div>
+            <div class="breakdown-divider"></div>
+            <div class="breakdown-row total-row">
+              <span class="row-label font-bold">Total Bill with Tip</span>
+              <span class="row-value font-bold" id="display-total-bill">$0.00</span>
+            </div>
+          </div>
+
+          <!-- Visual Distribution Ratio Bar -->
+          <div class="ratio-bar-wrapper">
+            <div class="ratio-labels">
+              <span>Bill: <strong id="ratio-bill-pct">100%</strong></span>
+              <span>Tip: <strong id="ratio-tip-pct">0%</strong></span>
+            </div>
+            <div class="ratio-bar-track">
+              <div class="ratio-segment ratio-bill" id="bar-bill" style="width: 100%;"></div>
+              <div class="ratio-segment ratio-tip" id="bar-tip" style="width: 0%;"></div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="action-buttons">
+            <button type="button" class="btn-primary" id="copy-summary-btn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              <span>Copy Breakdown</span>
+            </button>
+            <button type="button" class="btn-secondary" id="share-summary-btn" title="Quick Share">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="18" cy="5" r="3"></circle>
+                <circle cx="6" cy="12" r="3"></circle>
+                <circle cx="18" cy="19" r="3"></circle>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>Built with <span class="heart">♥</span> as an AI pair programming mini app • Challenge 1</p>
+    </footer>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast" class="toast" role="alert" aria-live="polite">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <path d="M20 6L9 17l-5-5"></path>
+    </svg>
+    <span id="toast-message">Summary copied to clipboard!</span>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
